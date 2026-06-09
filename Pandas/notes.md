@@ -17,3 +17,12 @@
 - Reduces a set of values into a single summary value
 - Used to summarize and analyze data
 - Often used with the groupby() function
+
+# Data Cleaning :
+
+- The process of fixing/removing incomplete, incorrect or irrelevant data.
+
+df = df.dropna()
+df = df.fillna()
+df = df.to_string()
+df = df.drop_duplicates()
