@@ -1,152 +1,98 @@
-# from abc import ABC, abstractmethod
-# class BankAccount(ABC):
-
-#     total_account = 0
-
-#     def __init__(self, name, account_no, balance):
-#         self.name = name
-#         self.account_no = account_no
-#         self.__balance = balance #Encapsulation
-
-#         BankAccount.total_account += 1
-
-#         @abstractmethod
-
-#         def deposit(self, amount):
-#             pass
-
-#         @abstractmethod
-
-#         def withdrawn(self, amount):
-#             pass
-
-#         def getBalance(self):
-#             return self.__balance
-        
-#         def setBalance(self, value):
-#             self.__balance = value
-#             return self.__balance
-        
-#         def __str__(self):
-#             return f"Account Info : {self.account_no}"
-
-# class SavingAccount(BankAccount):    #Inheritance
-
-#     min_balance = 500
-
-#     def withdrawn(self, amount):
-
-#         isValid = self.getBalance()
-#         amount >= self.min_balance
-
-#         if(isValid):
-
-#         else:
-
-
-#     def deposit(self, amount):
-
-#         new_amount = self.getBalance() + amount
-#         self.setBalance(new_amount)
-#         return f"Deposit Successful. Balance updated{self.getBalance()}"
-
-
-# class CurrentAccount(BankAccount):
-#     overdraft_limit = 1000
-
-#     def withdrawn(self, amount):
-
-#     def deposit(self, amount):
-
-
-
 from abc import ABC, abstractmethod
 
 class BankAccount(ABC):
-
     total_account = 0
 
     def __init__(self, name, account_no, balance):
+        if balance < 0:
+            raise ValueError("Initial balance cannot be negative")
+
         self.name = name
         self.account_no = account_no
-        self.__balance = balance   # Encapsulation
+        self.__balance = balance
 
         BankAccount.total_account += 1
 
-
     @abstractmethod
     def deposit(self, amount):
         pass
 
-
     @abstractmethod
-    def withdrawn(self, amount):
+    def withdraw(self, amount):
         pass
 
-
-    def getBalance(self):
+    def get_balance(self):
         return self.__balance
 
-
-    def setBalance(self, value):
+    def _update_balance(self, value):
         self.__balance = value
 
-
     def __str__(self):
-        return f"Account Info : {self.account_no} | Name : {self.name} | Balance : {self.__balance}"
+        return (
+            f"Account: {self.account_no} | "
+            f"Name: {self.name} | "
+            f"Balance: ₹{self.__balance}"
+        )
 
 
-# Saving Account
 class SavingAccount(BankAccount):
-
     min_balance = 500
 
-    def withdrawn(self, amount):
+    def deposit(self, amount):
+        if amount <= 0:
+            return "Amount must be greater than zero"
 
-        balance = self.getBalance()
+        self._update_balance(self.get_balance() + amount)
+        return f"Deposit successful. Balance = ₹{self.get_balance()}"
+
+    def withdraw(self, amount):
+        if amount <= 0:
+            return "Amount must be greater than zero"
+
+        balance = self.get_balance()
 
         if balance - amount >= self.min_balance:
+            self._update_balance(balance - amount)
+            return f"Withdrawal successful. Balance = ₹{self.get_balance()}"
 
-            new_balance = balance - amount
-            self.setBalance(new_balance)
-
-            return f"Withdraw Successful. Balance = {self.getBalance()}"
-
-        else:
-            return "Withdraw Failed. Minimum balance must be 500"
+        return "Withdrawal failed. Minimum balance must be ₹500"
 
 
-    def deposit(self, amount):
-
-        new_balance = self.getBalance() + amount
-        self.setBalance(new_balance)
-
-        return f"Deposit Successful. Balance = {self.getBalance()}"
-
-
-# Current Account
 class CurrentAccount(BankAccount):
-
     overdraft_limit = 1000
 
-    def withdrawn(self, amount):
+    def deposit(self, amount):
+        if amount <= 0:
+            return "Amount must be greater than zero"
 
-        balance = self.getBalance()
+        self._update_balance(self.get_balance() + amount)
+        return f"Deposit successful. Balance = ₹{self.get_balance()}"
+
+    def withdraw(self, amount):
+        if amount <= 0:
+            return "Amount must be greater than zero"
+
+        balance = self.get_balance()
 
         if balance - amount >= -self.overdraft_limit:
+            self._update_balance(balance - amount)
+            return f"Withdrawal successful. Balance = ₹{self.get_balance()}"
 
-            new_balance = balance - amount
-            self.setBalance(new_balance)
-
-            return f"Withdraw Successful. Balance = {self.getBalance()}"
-
-        else:
-            return "Withdraw Failed. Overdraft limit exceeded"
+        return "Withdrawal failed. Overdraft limit exceeded"
 
 
-    def deposit(self, amount):
+# Create accounts
+saving = SavingAccount("Rahul", 101, 5000)
+current = CurrentAccount("Priya", 102, 1000)
 
-        new_balance = self.getBalance() + amount
-        self.setBalance(new_balance)
+print("=== Savings Account ===")
+print(saving)
+print(saving.withdraw(1000))
+print(saving.deposit(500))
 
-        return f"Deposit Successful. Balance = {self.getBalance()}"
+print("\n=== Current Account ===")
+print(current)
+print(current.withdraw(1500))
+print(current.deposit(200))
+
+print("\nTotal accounts:", BankAccount.total_account)
